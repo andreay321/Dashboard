@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Central Finance AI Agent Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: '72', 'Arial', sans-serif;
+            background-color: #f5f5f5;
+            color: #32363a;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #0070f2 0%, #0053b8 100%);
+            color: white;
+            padding: 2rem 3rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 300;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            font-size: 0.95rem;
+            opacity: 0.9;
+        }
+
+        .comments-section {
+            background: white;
+            margin: 2rem 3rem;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .comments-section h2 {
+            font-size: 1.25rem;
+            font-weight: 400;
+            margin-bottom: 1rem;
+            color: #0070f2;
+            border-bottom: 2px solid #0070f2;
+            padding-bottom: 0.5rem;
+        }
+
+        .comment-box {
+            background: #f7f7f7;
+            padding: 1.5rem;
+            border-radius: 6px;
+            border-left: 4px solid #0070f2;
+            margin-top: 1rem;
+        }
+
+        .comment-box p {
+            line-height: 1.6;
+            color: #32363a;
+        }
+
+        .dashboard-section {
+            background: white;
+            margin: 2rem 3rem;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .dashboard-section h2 {
+            font-size: 1.25rem;
+            font-weight: 400;
+            margin-bottom: 1.5rem;
+            color: #0070f2;
+        }
+
+        .stats-bar {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .stat-card {
+            flex: 1;
+            min-width: 200px;
+            background: linear-gradient(135deg, #f7f7f7 0%, #e5e5e5 100%);
+            padding: 1.5rem;
+            border-radius: 6px;
+            border-left: 4px solid #0070f2;
+        }
+
+        .stat-card h4 {
+            font-size: 0.85rem;
+            color: #666;
+            font-weight: 400;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card .stat-value {
+            font-size: 2rem;
+            font-weight: 300;
+            color: #0070f2;
+        }
+
+        .filter-bar {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-bar input {
+            flex: 1;
+            min-width: 200px;
+            padding: 0.75rem;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        .filter-bar select {
+            padding: 0.75rem;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            background: white;
+            cursor: pointer;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        thead {
+            background-color: #f7f7f7;
+        }
+
+        th {
+            text-align: left;
+            padding: 1rem;
+            font-weight: 600;
+            color: #32363a;
+            border-bottom: 2px solid #e5e5e5;
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        tbody tr {
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        tbody tr:hover {
+            background-color: #f0f7ff;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .status-poc {
+            background-color: #fff3e0;
+            color: #e65100;
+        }
+
+        .status-onboarding {
+            background-color: #e1f5fe;
+            color: #0277bd;
+        }
+
+        .status-dev {
+            background-color: #e6f4ea;
+            color: #1e7e34;
+        }
+
+        .status-commercial {
+            background-color: #f3e5f5;
+            color: #6a1b9a;
+        }
+
+        .link-cell a {
+            color: #0070f2;
+            text-decoration: none;
+        }
+
+        .link-cell a:hover {
+            text-decoration: underline;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 0;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 700px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            animation: slideIn 0.3s;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #0070f2 0%, #0053b8 100%);
+            color: white;
+            padding: 1.5rem 2rem;
+            border-radius: 8px 8px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            font-size: 1.25rem;
+            font-weight: 400;
+        }
+
+        .close {
+            color: white;
+            font-size: 1.75rem;
+            font-weight: 300;
+            cursor: pointer;
+            line-height: 1;
+            transition: opacity 0.2s;
+        }
+
+        .close:hover {
+            opacity: 0.7;
+        }
+
+        .modal-body {
+            padding: 2rem;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+
+        .info-group {
+            background: #f7f7f7;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1.5rem;
+        }
+
+        .info-group p {
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .info-group strong {
+            color: #0070f2;
+        }
+
+        .info-detail {
+            background: white;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            border-left: 3px solid #0070f2;
+        }
+
+        .info-detail h4 {
+            font-size: 0.95rem;
+            color: #0070f2;
+            margin-bottom: 0.5rem;
+        }
+
+        .info-detail p {
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .comments-history {
+            margin-bottom: 2rem;
+        }
+
+        .comments-history h4 {
+            font-size: 1rem;
+            font-weight: 500;
+            color: #32363a;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        .comment-item {
+            background: #f7f7f7;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 0.75rem;
+            border-left: 3px solid #0070f2;
+        }
+
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .comment-status-change {
+            display: inline-block;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #0070f2;
+        }
+
+        .comment-timestamp {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .comment-text {
+            font-size: 0.9rem;
+            color: #32363a;
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+
+        .no-comments {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+            font-style: italic;
+        }
+
+        .new-comment-section {
+            border-top: 2px solid #e5e5e5;
+            padding-top: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .new-comment-section h4 {
+            font-size: 1rem;
+            font-weight: 500;
+            color: #32363a;
+            margin-bottom: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #32363a;
+        }
+
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            background: white;
+            cursor: pointer;
+        }
+
+        .modal-footer {
+            padding: 1.5rem 2rem;
+            border-top: 1px solid #e5e5e5;
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        .btn-primary {
+            background-color: #0070f2;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #0053b8;
+            box-shadow: 0 2px 8px rgba(0, 112, 242, 0.3);
+        }
+
+        .btn-secondary {
+            background-color: #f7f7f7;
+            color: #32363a;
+            border: 1px solid #d9d9d9;
+        }
+
+        .btn-secondary:hover {
+            background-color: #e5e5e5;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Central Finance AI Agent Dashboard</h1>
+        <p>AI Development Portfolio - Beijing Team</p>
+    </div>
+
+    <div class="comments-section">
+        <h2>Dashboard Overview</h2>
+        <div class="comment-box">
+            <p><strong>Purpose:</strong> This dashboard tracks all AI agent development initiatives within the Central Finance Beijing team. Each entry represents an AI agent or tool being developed, deployed, or maintained.</p>
+            <p style="margin-top: 1rem;"><strong>How to use:</strong> Click on any row to view details and update the status with comments. Use filters to find specific agents by name, team, or delivery timeline.</p>
+        </div>
+    </div>
+
+    <div class="dashboard-section">
+        <h2>AI Agent Portfolio</h2>
+
+        <div class="stats-bar">
+            <div class="stat-card">
+                <h4>Total Agents</h4>
+                <div class="stat-value" id="totalAgents">9</div>
+            </div>
+            <div class="stat-card">
+                <h4>OP2025 FPS2</h4>
+                <div class="stat-value" id="fps2Count">1</div>
+            </div>
+            <div class="stat-card">
+                <h4>OP2025 FPS3</h4>
+                <div class="stat-value" id="fps3Count">7</div>
+            </div>
+            <div class="stat-card">
+                <h4>With JIRA Entry</h4>
+                <div class="stat-value" id="jiraCount">8</div>
+            </div>
+        </div>
+
+        <div class="filter-bar">
+            <input type="text" id="searchInput" placeholder="Search by assistant, agent, team, or scope...">
+            <select id="teamFilter">
+                <option value="">All Teams</option>
+                <option value="Lian">Lian</option>
+                <option value="Jenny">Jenny</option>
+                <option value="Lucy">Lucy</option>
+            </select>
+            <select id="timelineFilter">
+                <option value="">All Timelines</option>
+                <option value="OP2025 FPS2">OP2025 FPS2</option>
+                <option value="OP2025 FPS3">OP2025 FPS3</option>
+            </select>
+        </div>
+
+        <table id="agentTable">
+            <thead>
+                <tr>
+                    <th>Assistant</th>
+                    <th>Agent</th>
+                    <th>Scope</th>
+                    <th>Team</th>
+                    <th>Delivery Timeline</th>
+                    <th>Status</th>
+                    <th>JIRA</th>
+                </tr>
+            </thead>
+            <tbody id="agentTableBody">
+            </tbody>
+        </table>
+    </div>
+
+    <div id="statusModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Agent Details & Comments</h3>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="info-group">
+                    <p><strong>Assistant:</strong> <span id="modalAssistant"></span></p>
+                    <p><strong>Agent:</strong> <span id="modalAgent"></span></p>
+                    <p><strong>Team:</strong> <span id="modalTeam"></span></p>
+                    <p><strong>Delivery Timeline:</strong> <span id="modalTimeline"></span></p>
+                </div>
+
+                <div class="info-detail">
+                    <h4>Scope</h4>
+                    <p id="modalScope"></p>
+                </div>
+
+                <div class="info-detail" id="aiIdSection" style="display:none;">
+                    <h4>AI ID</h4>
+                    <p id="modalAiId"></p>
+                </div>
+
+                <div class="info-detail" id="jarvisSection" style="display:none;">
+                    <h4>Jarvis Status</h4>
+                    <p id="modalJarvis"></p>
+                </div>
+
+                <div class="info-detail" id="ahaSection" style="display:none;">
+                    <h4>AHA</h4>
+                    <p id="modalAha"></p>
+                </div>
+
+                <div class="comments-history">
+                    <h4>Status Comments History</h4>
+                    <div id="commentsHistoryContainer">
+                        <div class="no-comments">No comments yet</div>
+                    </div>
+                </div>
+
+                <div class="new-comment-section">
+                    <h4>Add New Comment</h4>
+                    <div class="form-group">
+                        <label for="statusComment">Comment</label>
+                        <textarea id="statusComment" placeholder="Enter your status update or comments..."></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal()">Close</button>
+                <button class="btn btn-primary" onclick="saveComment()">Save Comment</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data from Excel
+        const agentsData = [
+            {
+                assistant: "Accrual Assistant",
+                agent: "Accounting Accrual Agent",
+                scope: "Automate the preparation of manual accruals and deferrals.",
+                aiId: "",
+                team: "Lian",
+                timeline: "OP2025 FPS2",
+                aligned: "Yes",
+                jira: "https://jira.tools.sap/browse/CLEPRIVFIN-2569",
+                jarvis: "MXP Launcher",
+                aha: "Jarvis - PuC",
+                statusComment: "TCI in process"
+            },
+            {
+                assistant: "Accrual Assistant",
+                agent: "Completeness Monitor Agent",
+                scope: "Detect missing Accrual items in closing",
+                aiId: "",
+                team: "Lian",
+                timeline: "OP2025 FPS3",
+                aligned: "Yes",
+                jira: "https://jira.tools.sap/browse/CLEPRIVFIN-2620",
+                jarvis: "",
+                aha: "",
+                statusComment: ""
+            },
+            {
+                assistant: "Accrual Assistant",
+                agent: "Readiness Agent",
+                scope: "Validate master data quality early and preventing errors in data proposals.",
+                aiId: "",
+                team: "Lian",
+                timeline: "OP2025 FPS3",
+                aligned: "Yes",
+                jira: "https://jira.tools.sap/browse/CLEPRIVFIN-2618",
+                jarvis: "",
+                aha: "",
+                statusComment: "investigation is started; backend could be reused with CFIN Operation"
+            },
+            {
+                assistant: "Accrual Assistant",
+                agent: "Reconciliation Agent",
+                scope: "Provide explainability & insight for accrual with natural-language questions",
+                aiId: "",
+                team: "Jenny",
+                timeline: "OP2025 FPS3",
+                aligned: "Yes",
+                jira: "https://jira.tools.sap/browse/CLEPRIVFIN-2621",
+                jarvis: "",
+                aha: "",
+                statusComment: "investigation is started"
+            },
+            {
+                assistant: "ICMR Assistant",
+                agent: "Resolution Agent",
+                scope: "Work as part of Intercompany Matching and Recon conciliation Assistant for accrual calculation",
+                aiId: "AI569",
+                team: "Lian",
+                timeline: "OP2025 FPS3",
+                aligned: "Yes",
+                jira: "https://jira.tools.sap/browse/CLEPRIVFIN-2614",
+                jarvis: "MXP Launcher",
+                aha: "Intercompany Resolution Agent",
+                statusComment: "Dev in process: Fiori + Joule is designed; Joule Work isn't clear."
+            },
+            {
+                assistant: "Settlement Assistant",
+                agent: "Settlement Rule for Investment Measure Agent",
+                scope: "Agent for settlement rule proposal for investment measure",
+                aiId: "",
+                team: "Jenny",
+                timeline: "OP2025 FPS3",
+                aligned: "Yes",
+                jira: "https://jira.tools.sap/browse/CLEPRIVFIN-2632",
+                jarvis: "existing",
+                aha: "",
+                statusComment: "Dev in process: Fiori + Joule for FPS3"
+            },
+            {
+                assistant: "",
+                agent: "Allocation amount explanation",
+                scope: "Provide a clear and detailed explanation of a specific allocation amount transferred from a sender to a receiver.",
+                aiId: "",
+                team: "Lucy",
+                timeline: "OP2025 FPS3",
+                aligned: "Yes",
+                jira: "https://jira.tools.sap/browse/PCPGENAIPRODZ-5007",
+                jarvis: "existing",
+                aha: "",
+                statusComment: "Dev in process"
+            },
+            {
+                assistant: "Closing Assistant",
+                agent: "AI Agent for universal allocation mangement",
+                scope: "autonomy allocation management",
+                aiId: "",
+                team: "Lucy",
+                timeline: "",
+                aligned: "No",
+                jira: "",
+                jarvis: "",
+                aha: "",
+                statusComment: ""
+            },
+            {
+                assistant: "CFIN Operation Assistant",
+                agent: "Data consistency agent",
+                scope: "Automatically handle master data consistency issues in Central Finance system to prevent replication errors.",
+                aiId: "",
+                team: "Lian",
+                timeline: "OP2025 FPS3",
+                aligned: "Yes",
+                jira: "https://jira.tools.sap/browse/CLEPRIVFIN-2124",
+                jarvis: "existing",
+                aha: "",
+                statusComment: "On hold for final Product decision"
+            }
+        ];
+
+        // Comments storage
+        const commentsStore = {};
+
+        // Initialize comments with existing status comments
+        agentsData.forEach((agent, index) => {
+            if (agent.statusComment) {
+                commentsStore[index] = [{
+                    comment: agent.statusComment,
+                    timestamp: '2026-07-01 10:00',
+                    author: agent.team
+                }];
+            }
+        });
+
+        let currentRowId = null;
+        const modal = document.getElementById('statusModal');
+        const closeBtn = document.querySelector('.close');
+
+        // Render table
+        function renderTable() {
+            const tbody = document.getElementById('agentTableBody');
+            tbody.innerHTML = agentsData.map((agent, index) => `
+                <tr data-id="${index}" onclick="openModal(${index})">
+                    <td>${agent.assistant || '-'}</td>
+                    <td><strong>${agent.agent}</strong></td>
+                    <td>${agent.scope}</td>
+                    <td>${agent.team}</td>
+                    <td>${agent.timeline || '-'}</td>
+                    <td><span class="status-badge status-dev">${agent.statusComment ? 'In Progress' : 'Planned'}</span></td>
+                    <td class="link-cell">
+                        ${agent.jira ? `<a href="${agent.jira}" target="_blank" onclick="event.stopPropagation()">JIRA</a>` : '-'}
+                    </td>
+                </tr>
+            `).join('');
+            updateStats();
+        }
+
+        function openModal(id) {
+            currentRowId = id;
+            const agent = agentsData[id];
+
+            document.getElementById('modalAssistant').textContent = agent.assistant || '-';
+            document.getElementById('modalAgent').textContent = agent.agent;
+            document.getElementById('modalTeam').textContent = agent.team;
+            document.getElementById('modalTimeline').textContent = agent.timeline || '-';
+            document.getElementById('modalScope').textContent = agent.scope;
+
+            // Show/hide optional sections
+            const aiIdSection = document.getElementById('aiIdSection');
+            const jarvisSection = document.getElementById('jarvisSection');
+            const ahaSection = document.getElementById('ahaSection');
+
+            if (agent.aiId) {
+                document.getElementById('modalAiId').textContent = agent.aiId;
+                aiIdSection.style.display = 'block';
+            } else {
+                aiIdSection.style.display = 'none';
+            }
+
+            if (agent.jarvis) {
+                document.getElementById('modalJarvis').textContent = agent.jarvis;
+                jarvisSection.style.display = 'block';
+            } else {
+                jarvisSection.style.display = 'none';
+            }
+
+            if (agent.aha) {
+                document.getElementById('modalAha').textContent = agent.aha;
+                ahaSection.style.display = 'block';
+            } else {
+                ahaSection.style.display = 'none';
+            }
+
+            renderCommentsHistory(id);
+            document.getElementById('statusComment').value = '';
+            modal.style.display = 'block';
+        }
+
+        function renderCommentsHistory(agentId) {
+            const container = document.getElementById('commentsHistoryContainer');
+            const comments = commentsStore[agentId] || [];
+
+            if (comments.length === 0) {
+                container.innerHTML = '<div class="no-comments">No comments yet</div>';
+                return;
+            }
+
+            container.innerHTML = comments.map(comment => `
+                <div class="comment-item">
+                    <div class="comment-header">
+                        <span class="comment-status-change">Update by ${comment.author}</span>
+                        <span class="comment-timestamp">${comment.timestamp}</span>
+                    </div>
+                    <div class="comment-text">${comment.comment}</div>
+                </div>
+            `).join('');
+        }
+
+        function closeModal() {
+            modal.style.display = 'none';
+        }
+
+        function saveComment() {
+            const comment = document.getElementById('statusComment').value;
+
+            if (!comment.trim()) {
+                alert('Please enter a comment');
+                return;
+            }
+
+            const agent = agentsData[currentRowId];
+
+            if (!commentsStore[currentRowId]) {
+                commentsStore[currentRowId] = [];
+            }
+
+            const now = new Date();
+            const timestamp = now.getFullYear() + '-' +
+                             String(now.getMonth() + 1).padStart(2, '0') + '-' +
+                             String(now.getDate()).padStart(2, '0') + ' ' +
+                             String(now.getHours()).padStart(2, '0') + ':' +
+                             String(now.getMinutes()).padStart(2, '0');
+
+            commentsStore[currentRowId].push({
+                comment: comment,
+                timestamp: timestamp,
+                author: agent.team
+            });
+
+            renderCommentsHistory(currentRowId);
+            document.getElementById('statusComment').value = '';
+            alert('Comment added successfully!');
+
+            // Save to localStorage
+            localStorage.setItem('agentComments', JSON.stringify(commentsStore));
+        }
+
+        closeBtn.onclick = closeModal;
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+
+        // Filter functionality
+        document.getElementById('searchInput').addEventListener('input', filterTable);
+        document.getElementById('teamFilter').addEventListener('change', filterTable);
+        document.getElementById('timelineFilter').addEventListener('change', filterTable);
+
+        function filterTable() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const teamFilter = document.getElementById('teamFilter').value;
+            const timelineFilter = document.getElementById('timelineFilter').value;
+            const rows = document.querySelectorAll('#agentTable tbody tr');
+
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                const team = row.cells[3].textContent;
+                const timeline = row.cells[4].textContent;
+
+                const matchesSearch = text.includes(searchTerm);
+                const matchesTeam = !teamFilter || team === teamFilter;
+                const matchesTimeline = !timelineFilter || timeline === timelineFilter;
+
+                row.style.display = (matchesSearch && matchesTeam && matchesTimeline) ? '' : 'none';
+            });
+        }
+
+        function updateStats() {
+            const fps2Count = agentsData.filter(a => a.timeline === 'OP2025 FPS2').length;
+            const fps3Count = agentsData.filter(a => a.timeline === 'OP2025 FPS3').length;
+            const jiraCount = agentsData.filter(a => a.jira).length;
+
+            document.getElementById('totalAgents').textContent = agentsData.length;
+            document.getElementById('fps2Count').textContent = fps2Count;
+            document.getElementById('fps3Count').textContent = fps3Count;
+            document.getElementById('jiraCount').textContent = jiraCount;
+        }
+
+        // Load comments from localStorage
+        const savedComments = localStorage.getItem('agentComments');
+        if (savedComments) {
+            Object.assign(commentsStore, JSON.parse(savedComments));
+        }
+
+        // Initialize
+        renderTable();
+    </script>
+</body>
+</html>
